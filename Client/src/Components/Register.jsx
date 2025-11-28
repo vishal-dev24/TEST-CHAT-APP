@@ -18,7 +18,7 @@ const Register = () => {
         data.append('email', formData.email);
         data.append('password', formData.password);
         data.append('image', formData.image);
-        await axios.post('http://localhost:4000/register', data, { withCredentials: true });
+        await axios.post('https://test-chat-app-no37.onrender.com/register', data, { withCredentials: true });
         setFormData({ username: '', email: '', password: '', image: null });
         navigate('/login');
     }

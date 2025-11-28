@@ -8,7 +8,7 @@ const Home = () => {
 
   const fetchUser = async () => {
     try {
-      const res = await axios.get('http://localhost:4000/profile', { withCredentials: true });
+      const res = await axios.get('https://test-chat-app-no37.onrender.com/profile', { withCredentials: true });
       setUser(res.data);
     } catch (error) {
       setUser(null);
@@ -21,7 +21,7 @@ const Home = () => {
   }, []);
 
   const handleLogout = async () => {
-    await axios.get('http://localhost:4000/logout', { withCredentials: true });
+    await axios.get('https://test-chat-app-no37.onrender.com/logout', { withCredentials: true });
     navigate('/login');
   };
 
@@ -39,7 +39,7 @@ const Home = () => {
         {user && (
           <>
             <div className="relative inline-block">
-              <img src={`http://localhost:4000/uploads/${user.image}`} alt="User" className="w-36 h-36 mx-auto rounded-xl shadow- border-4 border-blue-300" />
+              <img src={`https://test-chat-app-no37.onrender.com/uploads/${user.image}`} alt="User" className="w-36 h-36 mx-auto rounded-xl shadow- border-4 border-blue-300" />
             </div>
             <h1 className="text-2xl font-extrabold text-gray-800 mt-3">{user.username}</h1>
             <h2 className="text-gray-700 text-lg mb-2">{user.email}</h2>
