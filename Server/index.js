@@ -11,13 +11,13 @@ const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: ['https://test-chat-app-no37.onrender.com'], credentials: true } });
+const io = new Server(server, { cors: { origin: ['https://test-chat-app-no37.onrender.com', 'https://test-chat-app-1.onrender.com'], credentials: true } });
 
 
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(cors({ origin: ['https://test-chat-app-1.onrender.com'], credentials: true }));
+app.use(cors({ origin: ['https://test-chat-app-1.onrender.com', 'https://test-chat-app-no37.onrender.com'], credentials: true }));
 
 const usersOnline = {}; // 🔥 Active users track करने के लिए
 
