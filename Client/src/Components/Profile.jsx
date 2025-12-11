@@ -8,7 +8,7 @@ const Home = () => {
 
   const fetchUser = async () => {
     try {
-      const res = await axios.get('http://localhost:4000/profile', { withCredentials: true });
+      const res = await axios.get('https://test-chat-app-no37.onrender.com/profile', { withCredentials: true });
       setUser(res.data);
     } catch (error) {
       setUser(null);
