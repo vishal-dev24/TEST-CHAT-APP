@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import axios from "axios";
 
-const socket = io("https://test-chat-app-1.onrender.com", { withCredentials: true });
+const socket = io("https://test-chat-app-no37.onrender.com", { withCredentials: true });
 
 const Home = () => {
     const [users, setUsers] = useState([]);
@@ -17,20 +17,20 @@ const Home = () => {
     const [lastWidth, setLastWidth] = useState(window.innerWidth);
 
     useEffect(() => {
-        axios.get("https://test-chat-app-1.onrender.com/profile", { withCredentials: true })
+        axios.get("https://test-chat-app-no37.onrender.com/profile", { withCredentials: true })
             .then(res => setCurrentUser(res.data))
             .catch(() => navigate("/login"));
     }, [navigate]);
 
     useEffect(() => {
-        axios.get("https://test-chat-app-1.onrender.com/users", { withCredentials: true })
+        axios.get("https://test-chat-app-no37.onrender.com/users", { withCredentials: true })
             .then(res => setUsers(res.data));
     }, []);
 
     useEffect(() => {
         const fetchMessages = () => {
             if (selectedUser) {
-                axios.get(`https://test-chat-app-1.onrender.com/messages/${selectedUser._id}`, { withCredentials: true })
+                axios.get(`https://test-chat-app-no37.onrender.com/messages/${selectedUser._id}`, { withCredentials: true })
                     .then(res => setMessages(res.data))
                     .catch(err => console.error("Error fetching messages:", err));
             }

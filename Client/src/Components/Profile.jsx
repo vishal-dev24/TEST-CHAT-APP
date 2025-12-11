@@ -21,7 +21,7 @@ const Home = () => {
   }, []);
 
   const handleLogout = async () => {
-    await axios.get('https://test-chat-app-1.onrender.com/logout', { withCredentials: true });
+    await axios.get('https://test-chat-app-no37.onrender.com/logout', { withCredentials: true });
     navigate('/login');
   };
 

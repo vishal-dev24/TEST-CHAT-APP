@@ -14,7 +14,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('https://test-chat-app-1.onrender.com/login', formData, { withCredentials: true });
+            const res = await axios.post('https://test-chat-app-no37.onrender.com/login', formData, { withCredentials: true });
             console.log("Login Success:", res.data);
             setFormData({ email: '', password: '' });
             navigate('/profile');
