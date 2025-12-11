@@ -2,32 +2,23 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cookieParser = require('cookie-parser');
-const userModel = require('./models/users');
-const chatModel = require('./models/chatModel');
-const upload = require('./models/multer');
+const userModel = require('./routes/users')
+const chatModel = require('./routes/chatModel');
+const upload = require('./routes/cloudinary');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
-const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-    cors: {
-        origin: ['https://test-chat-app-no37.onrender.com', 'https://test-chat-app-1.onrender.com'],
-        credentials: true
-    }
-});
+const io = new Server(server, { cors: { origin: ['https://test-chat-app-1.onrender.com'], credentials: true } });
+// const io = new Server(server, { cors: { origin: ['http://localhost:5173',], credentials: true } });
 
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(cors({
-    origin: ['https://test-chat-app-no37.onrender.com', 'https://test-chat-app-1.onrender.com'],
-    credentials: true
-}));
-
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use(cors({ origin: ['https://test-chat-app-1.onrender.com'], credentials: true }));
+// app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 
 const usersOnline = {}; // 🔥 Active users track करने के लिए
 
@@ -35,17 +26,26 @@ const usersOnline = {}; // 🔥 Active users track करने के लिए
 // ✅ Registration
 app.post('/register', upload.single('image'), async (req, res) => {
     const { username, email, password } = req.body;
-    const imagefile = req.file ? req.file.filename : null;
+    const imageUrl = req.file?.path || null;
     const hash = await bcrypt.hash(password, 10);
-    const User = await userModel.create({ username, email, password: hash, image: imagefile });
-    const token = jwt.sign({ email: email, userId: User._id }, "shhhh");
-    res.cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-    })
-    res.json(User);
+    const user = await userModel.create({ username, email, password: hash, image: imageUrl })
+    const token = jwt.sign({ email: email, userId: user._id }, "shhhh");
+    res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none", })
+    res.json({ message: "registered" })
 });
+
+app.post('/register', upload.single('image'), async (req, res) => {
+    const { username, email, password } = req.body;
+    const imageUrl = req.file?.path || null;
+    const hash = await bcrypt.hash(password, 10);
+    const user = await userModel.create({ username, email, password: hash, image: imageUrl })
+    const token = jwt.sign({ email, userid: user._id }, "shhh");
+    res.cookie("token", token, { httpOnly: true, sameSite: "none", secure: true });
+    res.json({ message: "registered" })
+});
+
+
+
 
 // ✅ Login
 app.post('/login', async (req, res) => {
@@ -55,11 +55,7 @@ app.post('/login', async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
     const token = jwt.sign({ email: email, userId: user._id }, "shhhh");
-    res.cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-    })
+    res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none", })
     res.json(user);
 });
 
@@ -98,12 +94,9 @@ app.get('/users', isLoggedIn, async (req, res) => {
 // ✅ Send Message (Database + Real-time)
 app.post('/message', isLoggedIn, async (req, res) => {
     const { receiver, message } = req.body;
-
     // Message save in database
     const chat = await chatModel.create({ sender: req.user._id, receiver, message });
-
     console.log("🔥 New Message Sent:", chat);
-
     // **Real-time Message Emit**
     if (usersOnline[receiver]) {
         console.log(`📩 Sending message to receiver: ${receiver}`);
@@ -113,7 +106,6 @@ app.post('/message', isLoggedIn, async (req, res) => {
         console.log(`📩 Sending message to sender: ${req.user._id}`);
         io.to(usersOnline[req.user._id]).emit("newMessage", chat);
     }
-
     res.json(chat);
 });
 
