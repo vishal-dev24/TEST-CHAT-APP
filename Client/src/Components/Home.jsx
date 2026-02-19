@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import axios from "axios";
 
-const socket = io("https://test-chat-app-no37.onrender.com", { withCredentials: true });
+const BASE_URL = "https://test-chat-app-no37.onrender.com";
+const socket = io(`${BASE_URL}`, { withCredentials: true });
 
 const Home = () => {
     const [users, setUsers] = useState([]);
@@ -17,17 +18,16 @@ const Home = () => {
     const [lastWidth, setLastWidth] = useState(window.innerWidth);
 
     useEffect(() => {
-        axios.get("https://test-chat-app-no37.onrender.com/profile", { withCredentials: true })
+        axios.get(`${BASE_URL}/profile`, { withCredentials: true })
             .then(res => setCurrentUser(res.data))
             .catch(() => navigate("/login"));
     }, [navigate]);
 
     useEffect(() => {
-        axios.get("https://test-chat-app-no37.onrender.com/users", { withCredentials: true })
+        axios.get(`${BASE_URL}/users`, { withCredentials: true })
             .then(res => setUsers(res.data));
     }, []);
 
-  
     useEffect(() => {
         if (selectedUser) {
             axios.get(`${BASE_URL}/messages/${selectedUser._id}`, { withCredentials: true })
@@ -56,7 +56,10 @@ const Home = () => {
         }
     }, [currentUser]);
 
-    
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
+
     const sendMessage = async () => {
         if (!newMessage.trim()) return;
 
@@ -90,7 +93,7 @@ const Home = () => {
                 <div className="flex items-center gap-2">
                     {currentUser && (
                         <div className="flex items-center">
-                            <img src={currentUser.image} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full mr-2" />
+                            <img src={`${BASE_URL}/uploads/${currentUser.image}`} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full mr-2" />
                             <span className="font-medium text-lg">{currentUser.username}</span>
                         </div>
                     )}
@@ -103,7 +106,7 @@ const Home = () => {
                     <div className="bg-white border-r overflow-y-auto h-[calc(100vh-56px)] p-3 w-full sm:w-1/2 md:w-1/3">
                         {users.map((user) => (
                             <div key={user._id} onClick={() => setSelectedUser(user)} className={`flex items-center py-3 px-3 cursor-pointer hover:bg-gray-100 rounded-lg ${selectedUser?._id === user._id && "bg-gray-200"}`}>
-                                <img src={user.image} className="w-12 h-12 border border-teal-500 rounded-full mr-3" />
+                                <img src={`${BASE_URL}/uploads/${user.image}`} className="w-12 h-12 border border-teal-500 rounded-full mr-3" />
                                 <div className="flex-1">
                                     <span className="text-md font-medium">{user.username}</span>
                                     <p className="text-xs text-gray-500">{user.status || "Hey there! I'm using WhatsApp"}</p>
@@ -119,7 +122,7 @@ const Home = () => {
                             <div className="bg-white p-4 shadow-lg flex justify-between items-center fixed w-full sm:w-2/3">
                                 <div className="flex items-center justify-between w-full">
                                     <div className="flex items-center">
-                                        <img src={selectedUser.image} className="w-10 h-10 rounded-full border border-teal-500" />
+                                        <img src={`${BASE_URL}/uploads/${selectedUser.image}`} className="w-10 h-10 rounded-full border border-teal-500" />
                                         <h2 className="text-md sm:text-lg font-bold ms-3">{selectedUser.username}</h2>
                                     </div>
                                     {isMobile && <button onClick={() => setSelectedUser(null)} className="mr-3 px-3 py-1 bg-gray-200 rounded text-sm">Back</button>}
