@@ -38,18 +38,30 @@ const Home = () => {
     }, [selectedUser]);
 
 
-    useEffect(() => {
+ useEffect(() => {
         const handleNewMessage = (message) => {
-            if (message.sender === selectedUser?._id || message.receiver === selectedUser?._id || message.sender === currentUser?._id) {
-                setMessages(prev => [...prev, message]);
+            if (
+                selectedUser &&
+                (
+                    (message.sender === selectedUser._id && message.receiver === currentUser._id) ||
+                    (message.sender === currentUser._id && message.receiver === selectedUser._id)
+                )
+            ) {
+                setMessages(prev => {
+                    const alreadyExists = prev.some(msg => msg._id === message._id);
+                    if (alreadyExists) return prev;
+                    return [...prev, message];
+                });
+
+                setTimeout(() => {
+                    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+                }, 100);
             }
-            setTimeout(() => {
-                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-            }, 100);
         };
         socket.on("newMessage", handleNewMessage);
         return () => socket.off("newMessage", handleNewMessage);
     }, [selectedUser, currentUser]);
+
 
     useEffect(() => {
         if (currentUser) {
@@ -57,20 +69,18 @@ const Home = () => {
         }
     }, [currentUser]);
 
+    
     const sendMessage = async () => {
         if (!newMessage.trim()) return;
-
         const msgData = {
             sender: currentUser._id,
             receiver: selectedUser._id,
-            message: newMessage,
-            createdAt: new Date()
+            message: newMessage
         };
-
-        setMessages(prev => [...prev, msgData]);
         socket.emit("sendMessage", msgData);
         setNewMessage("");
     };
+
 
     useEffect(() => {
         const handleResize = () => {
