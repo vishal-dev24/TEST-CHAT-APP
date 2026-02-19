@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import axios from "axios";
 
-const BASE_URL = "https://test-chat-app-no37.onrender.com";
-const socket = io(`${BASE_URL}`, { withCredentials: true });
+const socket = io("https://test-chat-app-no37.onrender.com", { withCredentials: true });
 
 const Home = () => {
     const [users, setUsers] = useState([]);
@@ -18,19 +17,21 @@ const Home = () => {
     const [lastWidth, setLastWidth] = useState(window.innerWidth);
 
     useEffect(() => {
-        axios.get(`${BASE_URL}/profile`, { withCredentials: true })
+        axios.get("https://test-chat-app-no37.onrender.com/profile", { withCredentials: true })
             .then(res => setCurrentUser(res.data))
             .catch(() => navigate("/login"));
     }, [navigate]);
 
     useEffect(() => {
-        axios.get(`${BASE_URL}/users`, { withCredentials: true })
+        axios.get("https://test-chat-app-no37.onrender.com/users", { withCredentials: true })
             .then(res => setUsers(res.data));
     }, []);
 
-     useEffect(() => {
+
+
+    useEffect(() => {
         if (selectedUser) {
-            axios.get(`${BASE_URL}/messages/${selectedUser._id}`, { withCredentials: true })
+            axios.get(`https://test-chat-app-no37.onrender.com/messages/${selectedUser._id}`, { withCredentials: true })
                 .then(res => setMessages(res.data))
                 .catch(err => console.error("Error fetching messages:", err));
         }
@@ -82,7 +83,7 @@ const Home = () => {
         return () => window.removeEventListener("resize", handleResize);
     }, [lastWidth]);
 
-     return (
+    return (
         <div className="flex flex-col h-screen bg-gray-100">
             <div className="bg-white px-4 py-3 flex justify-between items-center shadow-md fixed top-0 w-full z-10">
                 <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-teal-500">WhatsApp</h1>
