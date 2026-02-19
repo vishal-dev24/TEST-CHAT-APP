@@ -27,17 +27,13 @@ const Home = () => {
             .then(res => setUsers(res.data));
     }, []);
 
+  
     useEffect(() => {
-        const fetchMessages = () => {
-            if (selectedUser) {
-                axios.get(`https://test-chat-app-no37.onrender.com/messages/${selectedUser._id}`, { withCredentials: true })
-                    .then(res => setMessages(res.data))
-                    .catch(err => console.error("Error fetching messages:", err));
-            }
-        };
-        fetchMessages(); // Pehli baar turant messages load kare
-        const interval = setInterval(fetchMessages, 1000); // Har 2 second me refresh karega
-        return () => clearInterval(interval); // Jab selectedUser change ho ya component unmount ho, tab interval clear hoga
+        if (selectedUser) {
+            axios.get(`${BASE_URL}/messages/${selectedUser._id}`, { withCredentials: true })
+                .then(res => setMessages(res.data))
+                .catch(err => console.error("Error fetching messages:", err));
+        }
     }, [selectedUser]);
 
 
@@ -55,9 +51,12 @@ const Home = () => {
     }, [selectedUser, currentUser]);
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
+        if (currentUser) {
+            socket.emit("join", currentUser._id);
+        }
+    }, [currentUser]);
 
+    
     const sendMessage = async () => {
         if (!newMessage.trim()) return;
 
